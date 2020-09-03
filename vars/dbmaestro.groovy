@@ -9,7 +9,7 @@ import groovyx.net.http.*
 
 @groovy.transform.Field
 def parameters = [jarPath: "", projectName: "", rsEnvName: "", authType: "", userName: "", authToken: "", server: "", packageDir: "", rsSchemaName: "", packagePrefix: "", \
-				  wsURL: "", wsUserName: "", wsPassword: "", wsUseHttps: false, useZipPackaging: false, archiveArtifact: false, fileFilter: "Database\\*.sql", packageHintPath: "", \
+				  proxyPath: "", wsURL: "", wsUserName: "", wsPassword: "", wsUseHttps: false, useZipPackaging: false, archiveArtifact: false, fileFilter: "Database\\*.sql", packageHintPath: "", \
 				  driftDashboard: [[name: "DBMAESTRO_PIPELINE", environments: ["RS", "QA", "UAT"]], [name: "DBMAESTRO_PIPELINE", environments: ["RS", "QA", "UAT"]]]]
 
 // Capture stdout lines, strip first line echo of provided command
@@ -218,6 +218,16 @@ def createPackage() {
 
 def upgradeReleaseSource() {
 	bat "java -jar \"${parameters.jarPath}\" -Upgrade -ProjectName ${parameters.projectName} -EnvName ${parameters.rsEnvName} -PackageName ${parameters.packagePrefix}${env.BUILD_NUMBER} -Server ${parameters.server} -AuthType ${parameters.authType} -UserName ${parameters.userName} -Password ${parameters.authToken}"
+}
+
+def runPackageCommand() {
+	bat "java -jar \"${parameters.jarPath}\" -Package -ProjectName ${parameters.projectName} -IgnoreScriptWarnings y -AuthType ${parameters.authType} -Server ${parameters.server} -UserName ${parameters.userName} -Password ${parameters.authToken}"
+}
+
+def uploadByProxy() {
+	def version = "${parameters.packagePrefix}${env.BUILD_NUMBER}"
+	def zipFileName = "${version}.dbmpackage.zip"
+	bat "curl -F \"packageFile=@${zipFileName}\" -X POST ${parameters.proxyPath}"
 }
 
 @NonCPS
