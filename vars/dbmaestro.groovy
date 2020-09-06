@@ -217,17 +217,17 @@ def createPackage() {
 }
 
 def upgradeReleaseSource() {
-	bat "java -jar \"${parameters.jarPath}\" -Upgrade -ProjectName ${parameters.projectName} -EnvName ${parameters.rsEnvName} -PackageName ${parameters.packagePrefix}${env.BUILD_NUMBER} -Server ${parameters.server} -AuthType ${parameters.authType} -UserName ${parameters.userName} -Password ${parameters.authToken}"
+	execCommand("java -jar \"${parameters.jarPath}\" -Upgrade -ProjectName ${parameters.projectName} -EnvName ${parameters.rsEnvName} -PackageName ${parameters.packagePrefix}${env.BUILD_NUMBER} -Server ${parameters.server} -AuthType ${parameters.authType} -UserName ${parameters.userName} -Password ${parameters.authToken}")
 }
 
 def runPackageCommand() {
-	bat "java -jar \"${parameters.jarPath}\" -Package -ProjectName ${parameters.projectName} -IgnoreScriptWarnings y -AuthType ${parameters.authType} -Server ${parameters.server} -UserName ${parameters.userName} -Password ${parameters.authToken}"
+	execCommand("java -jar \"${parameters.jarPath}\" -Package -ProjectName ${parameters.projectName} -IgnoreScriptWarnings y -AuthType ${parameters.authType} -Server ${parameters.server} -UserName ${parameters.userName} -Password ${parameters.authToken}")
 }
 
 def uploadByProxy() {
 	def version = "${parameters.packagePrefix}${env.BUILD_NUMBER}"
 	def zipFileName = "${version}.dbmpackage.zip"
-	bat "curl -F \"packageFile=@${zipFileName}\" -X POST ${parameters.proxyPath}"
+	execCommand("curl -F \"packageFile=@${zipFileName}\" -X POST ${parameters.proxyPath}")
 }
 
 @NonCPS
